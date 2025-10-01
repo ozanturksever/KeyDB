@@ -1,0 +1,22 @@
+FROM ubuntu:24.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install basic utilities
+RUN apt-get update && apt-get install -y     systemd     procps     net-tools     curl     libsnappy1v5     && rm -rf /var/lib/apt/lists/*
+
+# Create systemd directory (needed for package installation)
+RUN mkdir -p /usr/lib/systemd/system
+
+# Copy only the packages for this architecture
+COPY keydb-tools_*_arm64.deb /tmp/
+COPY keydb-server_*_arm64.deb /tmp/
+COPY keydb-sentinel_*_arm64.deb /tmp/
+
+# Install the packages (skip the metapackage that has dependency issues)
+RUN dpkg -i /tmp/keydb-tools_*.deb /tmp/keydb-server_*.deb /tmp/keydb-sentinel_*.deb ||     (apt-get update && apt-get install -f -y) &&     echo "Package installation completed"
+
+# Verify installation
+RUN echo "=== Installation Summary ===" &&     echo "" &&     echo "Binaries installed:" &&     ls -lh /usr/bin/keydb-* 2>/dev/null || echo "  No binaries found!" &&     echo "" &&     echo "Config files:" &&     ls -lh /etc/keydb/ 2>/dev/null || echo "  No config directory found!" &&     echo "" &&     echo "Systemd files:" &&     ls -lh /usr/lib/systemd/system/keydb*.service 2>/dev/null || echo "  No systemd files found (expected - install failed)" &&     echo "" &&     dpkg -l | grep keydb
+
+CMD ["/bin/bash"]

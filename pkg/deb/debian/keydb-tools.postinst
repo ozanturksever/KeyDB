@@ -31,15 +31,17 @@ Setup_dir () {
 
 if [ "$1" = "configure" ]
 then
-	adduser \
-		--system \
-		--home /var/lib/keydb \
-		--quiet \
-		--group \
-		${USER} || true
+	if ! getent passwd ${USER} >/dev/null 2>&1; then
+		adduser \
+			--system \
+			--home /var/lib/keydb \
+			--quiet \
+			--group \
+			${USER} || true
+	fi
 
-	Setup_dir /var/log/keydb ${USER}:adm 2750
-	Setup_dir /var/lib/keydb ${USER}:${USER} 750
+	Setup_dir /var/log/keydb 2750 adm
+	Setup_dir /var/lib/keydb 750 ${USER}
 fi
 
 #DEBHELPER#

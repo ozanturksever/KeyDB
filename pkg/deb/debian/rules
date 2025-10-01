@@ -19,7 +19,8 @@ endif
 	dh $@
 
 override_dh_auto_install:
-	debian/bin/generate-systemd-service-files
+	cp pkg/deb/debian/keydb-server.service debian/keydb-server.service
+	cp pkg/deb/debian/keydb-sentinel.service debian/keydb-sentinel.service
 	dh_installsystemd --restart-after-upgrade
 
 override_dh_auto_test:

@@ -8,18 +8,22 @@ CONFFILE="/etc/keydb/keydb.conf"
 
 if [ "$1" = "configure" ]
 then
-	if ! dpkg-statoverride --list ${CONFFILE} >/dev/null 2>&1
-	then
-		dpkg-statoverride --update --add ${USER} ${GROUP} 640 ${CONFFILE}
+	# Ensure the keydb user exists (should be created by keydb-tools)
+	if getent passwd ${USER} >/dev/null 2>&1; then
+		# Only set statoverride if config file exists
+		if [ -f ${CONFFILE} ]; then
+			if ! dpkg-statoverride --list ${CONFFILE} >/dev/null 2>&1
+			then
+				dpkg-statoverride --update --add ${USER} ${GROUP} 640 ${CONFFILE}
+			fi
+		fi
 	fi
+	
+	# Clean up empty config directories
+	find /etc/keydb -maxdepth 1 -type d -name 'keydb-server.*.d' -empty -delete 2>/dev/null || true
 fi
 
 #DEBHELPER#
-
-if [ "$1" = "configure" ]
-then
-	find /etc/keydb -maxdepth 1 -type d -name 'keydb-server.*.d' -empty -delete
-fi
 
 if [ -d /run/systemd/system ]; then
 	systemctl daemon-reload >/dev/null 2>&1 || true

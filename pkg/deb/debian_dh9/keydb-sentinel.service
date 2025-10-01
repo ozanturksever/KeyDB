@@ -1,0 +1,23 @@
+[Unit]
+Description=KeyDB Sentinel
+Documentation=https://docs.keydb.dev
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=notify
+ExecStart=/usr/bin/keydb-sentinel /etc/keydb/sentinel.conf --supervised systemd --daemonize no
+TimeoutStartSec=infinity
+TimeoutStopSec=infinity
+Restart=on-failure
+User=keydb
+Group=keydb
+RuntimeDirectory=keydb
+RuntimeDirectoryMode=0755
+LimitNOFILE=65535
+NoNewPrivileges=yes
+PrivateTmp=yes
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target
