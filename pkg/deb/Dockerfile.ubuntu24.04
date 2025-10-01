@@ -1,0 +1,41 @@
+FROM ubuntu:24.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y \
+    debhelper \
+    dpkg-dev \
+    pkg-config \
+    systemd \
+    libsystemd-dev \
+    procps \
+    build-essential \
+    tcl \
+    tcl-dev \
+    uuid-dev \
+    libcurl4-openssl-dev \
+    nasm \
+    autotools-dev \
+    autoconf \
+    libjemalloc-dev \
+    libssl-dev \
+    libsnappy-dev \
+    zlib1g-dev \
+    libbz2-dev \
+    liblz4-dev \
+    libzstd-dev \
+    git \
+    lsb-release \
+    devscripts \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /build
+
+# Copy the KeyDB source
+COPY . /build/KeyDB
+
+# Set up the build environment
+WORKDIR /build/KeyDB/pkg/deb
+
+CMD ["/bin/bash"]

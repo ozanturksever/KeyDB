@@ -86,7 +86,8 @@ RocksDBStorageFactory::RocksDBStorageFactory(const char *dbfile, int dbnum, cons
     {
         std::string options_string(rgchConfig, cchConfig);
         rocksdb::Status status;
-        if (!(status = rocksdb::GetDBOptionsFromString(options, options_string, &options)).ok())
+        rocksdb::ConfigOptions config_options;
+        if (!(status = rocksdb::GetDBOptionsFromString(config_options, options, options_string, &options)).ok())
         {
             fprintf(stderr, "Failed to parse FLASH options: %s\r\n", status.ToString().c_str());
             exit(EXIT_FAILURE);
